@@ -1,75 +1,194 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import React from 'react';
+import { 
+  View, 
+  Text, 
+  StyleSheet, 
+  SafeAreaView, 
+  TouchableOpacity,
+  FlatList,
+  StatusBar
+} from 'react-native';
+import { Feather } from '@expo/vector-icons';
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+// --- Mock Data for the List ---
+const grievancesData = [
+  {
+    id: '1',
+    title: 'Grade Discrepancy',
+    category: 'Academic',
+    status: 'Resolved',
+  },
+  {
+    id: '2',
+    title: 'Broken AC in Dorm',
+    category: 'Facilities',
+    status: 'In Progress',
+  },
+  {
+    id: '3',
+    title: 'Transcript Request Delay',
+    category: 'Administrative',
+    status: 'Submitted',
+  },
+];
 
+// --- Reusable Component for Each Grievance Item ---
+const GrievanceItem = ({ title, category, status }) => {
+  const getStatusColor = () => {
+    if (status === 'Resolved') return '#28a745'; // Green
+    if (status === 'In Progress') return '#ffc107'; // Orange/Yellow
+    return '#8A8A8E'; // Gray for Submitted
+  };
+
+  return (
+    <View style={styles.grievanceItem}>
+      <View>
+        <Text style={styles.grievanceTitle}>{title}</Text>
+        <Text style={styles.grievanceCategory}>{category}</Text>
+      </View>
+      <Text style={[styles.grievanceStatus, { color: getStatusColor() }]}>
+        {status}
+      </Text>
+    </View>
+  );
+};
+
+// --- Main Home Screen Component ---
 export default function HomeScreen() {
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    <SafeAreaView style={styles.safeArea}>
+      <StatusBar barStyle="dark-content" />
+      <View style={styles.container}>
+        
+        {/* Header */}
+        <View style={styles.header}>
+          <View style={styles.headerSide} />
+          <Text style={styles.headerTitle}>Home</Text>
+          <TouchableOpacity style={styles.headerSide}>
+            <Feather name="bell" size={24} color="#333" />
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.content}>
+          {/* Welcome Message */}
+          <Text style={styles.welcomeText}>Welcome, Sitesh</Text>
+
+          {/* Action Buttons */}
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity style={styles.primaryButton}>
+              <Text style={styles.primaryButtonText}>Submit Grievance</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.secondaryButton}>
+              <Text style={styles.secondaryButtonText}>Track Status</Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Recent Grievances List */}
+          <Text style={styles.sectionTitle}>Recent Grievances</Text>
+          <FlatList
+            data={grievancesData}
+            renderItem={({ item }) => <GrievanceItem {...item} />}
+            keyExtractor={item => item.id}
+            ItemSeparatorComponent={() => <View style={styles.separator} />}
+          />
+        </View>
+      </View>
+    </SafeAreaView>
   );
 }
 
+// --- Styles ---
 const styles = StyleSheet.create({
-  titleContainer: {
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  container: {
+    flex: 1,
+    backgroundColor: '#F7F8FA', // Light grey background
+  },
+  header: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    gap: 8,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    backgroundColor: '#fff',
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  headerSide: {
+    width: 24, // To balance the title
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  headerTitle: {
+    fontSize: 17,
+    fontWeight: '600',
+  },
+  content: {
+    paddingHorizontal: 20,
+  },
+  welcomeText: {
+    fontSize: 34,
+    fontWeight: 'bold',
+    marginTop: 20,
+    marginBottom: 25,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 40,
+  },
+  primaryButton: {
+    backgroundColor: '#007AFF',
+    paddingVertical: 14,
+    borderRadius: 10,
+    flex: 1, // Makes buttons share space
+    marginRight: 10,
+    alignItems: 'center',
+  },
+  primaryButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  secondaryButton: {
+    backgroundColor: '#EFEFF4',
+    paddingVertical: 14,
+    borderRadius: 10,
+    flex: 1, // Makes buttons share space
+    marginLeft: 10,
+    alignItems: 'center',
+  },
+  secondaryButtonText: {
+    color: '#000',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  sectionTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    marginBottom: 15,
+  },
+  grievanceItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 15,
+  },
+  grievanceTitle: {
+    fontSize: 16,
+    fontWeight: '500',
+  },
+  grievanceCategory: {
+    fontSize: 14,
+    color: '#8A8A8E',
+    marginTop: 4,
+  },
+  grievanceStatus: {
+    fontSize: 15,
+    fontWeight: '500',
+  },
+  separator: {
+    height: 1,
+    backgroundColor: '#EFEFF4',
   },
 });
+
